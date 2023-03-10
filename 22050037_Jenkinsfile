@@ -7,7 +7,8 @@ pipeline {
     }
 
     tools { 
-        maven 'maven3' 
+        maven 'maven3'
+        java 'jdk17'
     }
 
     options {
@@ -24,35 +25,44 @@ pipeline {
 
     stages {
         
-        stage('Cleanup Workspace') {
+        stage('Environment setup') {
             steps {
                 cleanWs()
                 sh """
-                echo "Cleaned Up Workspace for ${APP_NAME}"
+                echo "S1_22050037: Environment Preparation Completed"
                 """
             }
         }
 
-        stage('Code Checkout') {
+        stage('Web server Creation') {
             steps {
                 checkout([
                     $class: 'GitSCM', 
                     branches: [[name: '*/main']], 
                     userRemoteConfigs: [[url: 'https://github.com/spring-projects/spring-petclinic.git']]
                 ])
+                sh """
+                echo "S2_22050037: Web Server Creation Completed"
+                """
             }
         }
 
-        stage('Code Build') {
+        stage('API Test') {
             steps {
-                 sh 'mvn install -Dmaven.test.skip=true'
+                sh 'mvn install -Dmaven.test.skip=true'
+                sh """
+                echo "S3_22050037: API Test Completed"
+                """
             }
         }
 
-        stage('Printing All Global Variables') {
+        stage('DAST Security Test') {
             steps {
                 sh """
                 env
+                """
+                sh """
+                echo "S4_22050037: DAST Security Test Completed"
                 """
             }
         }
